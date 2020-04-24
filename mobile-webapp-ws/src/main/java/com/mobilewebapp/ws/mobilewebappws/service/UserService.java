@@ -1,9 +1,10 @@
 package com.mobilewebapp.ws.mobilewebappws.service;
 
-import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
-import com.mobilewebapp.ws.mobilewebappws.model.request.UserRequest;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserService {
+import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
+
+public interface UserService extends UserDetailsService{
 
 	UserDto createUser(UserDto userDto);
 

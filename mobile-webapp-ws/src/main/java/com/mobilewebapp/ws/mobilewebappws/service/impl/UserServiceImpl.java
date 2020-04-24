@@ -2,6 +2,9 @@ package com.mobilewebapp.ws.mobilewebappws.service.impl;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
@@ -19,6 +22,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private Utils utils;
 
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
+
 	@Override
 	public UserDto createUser(UserDto userDto) {
 
@@ -34,18 +40,23 @@ public class UserServiceImpl implements UserService {
 		// Take care of fields that are not nullable and aren't a part of the UI
 		// interaction as of now
 //		newUserEntity.setUserId("test");
-		newUserEntity.setEncryptedPassword("test");
+		newUserEntity.setEncryptedPassword(passwordEncoder.encode("test"));
 
 		// randomly generated userId
 		String userId = utils.generateUserId(25);
 		newUserEntity.setUserId(userId);
-		
+
 		UserEntity savedUserEntity = userRepo.save(newUserEntity);
 
 		UserDto returnUserDto = new UserDto();
 		BeanUtils.copyProperties(savedUserEntity, returnUserDto);
 
 		return returnUserDto;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return null;
 	}
 
 }
