@@ -1,7 +1,10 @@
 package com.mobilewebapp.ws.mobilewebappws.service.impl;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,10 +40,7 @@ public class UserServiceImpl implements UserService {
 		UserEntity newUserEntity = new UserEntity();
 		BeanUtils.copyProperties(userDto, newUserEntity);
 
-		// Take care of fields that are not nullable and aren't a part of the UI
-		// interaction as of now
-//		newUserEntity.setUserId("test");
-		newUserEntity.setEncryptedPassword(passwordEncoder.encode("test"));
+		newUserEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
 
 		// randomly generated userId
 		String userId = utils.generateUserId(25);
@@ -55,8 +55,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return null;
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		UserEntity userEntity = userRepo.findByEmail(email);
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(email);
+		}
+		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
 	}
 
 }

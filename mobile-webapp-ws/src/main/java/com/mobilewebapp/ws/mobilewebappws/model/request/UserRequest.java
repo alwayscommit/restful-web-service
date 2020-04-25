@@ -2,17 +2,17 @@ package com.mobilewebapp.ws.mobilewebappws.model.request;
 
 public class UserRequest {
 
-	private String userId;
+	private String password;
 	private String firstName;
 	private String lastName;
 	private String email;
 
-	public String getUserId() {
-		return userId;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getFirstName() {
