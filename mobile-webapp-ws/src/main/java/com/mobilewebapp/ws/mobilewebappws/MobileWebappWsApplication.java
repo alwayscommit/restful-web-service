@@ -11,10 +11,15 @@ public class MobileWebappWsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MobileWebappWsApplication.class, args);
 	}
-	
+
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public SpringAppContext springAppContext() {
+		return new SpringAppContext();
 	}
 
 }
