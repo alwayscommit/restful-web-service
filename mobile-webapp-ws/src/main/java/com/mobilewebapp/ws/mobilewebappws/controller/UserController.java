@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
+import com.mobilewebapp.ws.mobilewebappws.exception.UserServiceException;
 import com.mobilewebapp.ws.mobilewebappws.model.request.UserRequest;
+import com.mobilewebapp.ws.mobilewebappws.model.response.ErrorMessages;
 import com.mobilewebapp.ws.mobilewebappws.model.response.UserRest;
 import com.mobilewebapp.ws.mobilewebappws.service.UserService;
 
@@ -26,7 +28,12 @@ public class UserController {
 
 	@PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = {
 			MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-	public UserRest createUser(@RequestBody UserRequest userRequest) {
+	public UserRest createUser(@RequestBody UserRequest userRequest) throws Exception {
+
+		if (userRequest.getFirstName().isEmpty()) {
+			throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+		}
+
 		System.out.println("Creating a user...");
 
 		UserDto userDto = new UserDto();
