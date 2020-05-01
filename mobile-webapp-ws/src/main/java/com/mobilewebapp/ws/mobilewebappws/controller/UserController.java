@@ -1,5 +1,8 @@
 package com.mobilewebapp.ws.mobilewebappws.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
@@ -23,7 +27,8 @@ import com.mobilewebapp.ws.mobilewebappws.model.response.UserRest;
 import com.mobilewebapp.ws.mobilewebappws.service.UserService;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("users") // http://localhost:8080/ this is the root
+//context path = http://localhost:8080/mobile-app-ws/
 public class UserController {
 
 	@Autowired
@@ -84,6 +89,22 @@ public class UserController {
 		userService.deleteUser(id);
 		response.setOperationResult(RequestOperationStatus.SUCCESS.name());
 		return response;
+	}
+
+	@GetMapping(produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+	public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "limit", defaultValue = "25") int limit) {
+		List<UserRest> returnUserList = new ArrayList<UserRest>();
+
+		List<UserDto> users = userService.getUsers(page, limit);
+
+		for (UserDto user : users) {
+			UserRest userModel = new UserRest();
+			BeanUtils.copyProperties(user, userModel);
+			returnUserList.add(userModel);
+		}
+
+		return returnUserList;
 	}
 
 }

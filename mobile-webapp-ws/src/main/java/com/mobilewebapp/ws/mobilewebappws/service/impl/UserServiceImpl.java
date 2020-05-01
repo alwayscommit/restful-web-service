@@ -1,9 +1,13 @@
 package com.mobilewebapp.ws.mobilewebappws.service.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -80,7 +84,7 @@ public class UserServiceImpl implements UserService {
 		UserEntity userEntity = userRepo.findByUserId(id);
 
 		if (userEntity == null) {
-			throw new UsernameNotFoundException(id);
+			throw new UsernameNotFoundException("User with id " + id + " not found!");
 		}
 
 		UserDto userDto = new UserDto();
@@ -113,6 +117,27 @@ public class UserServiceImpl implements UserService {
 			throw new UsernameNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
 		}
 		userRepo.delete(userEntity);
+	}
+
+	@Override
+	public List<UserDto> getUsers(int page, int limit) {
+		List<UserDto> returnUserDtoList = new ArrayList<UserDto>();
+		
+		if(page>0) {
+			page = page - 1;
+		}
+		
+		Pageable pageReq = PageRequest.of(page, limit);
+		Page<UserEntity> usersPage = userRepo.findAll(pageReq);
+		List<UserEntity> users = usersPage.getContent();
+
+		for (UserEntity userEntity : users) {
+			UserDto userDto = new UserDto();
+			BeanUtils.copyProperties(userEntity, userDto);
+			returnUserDtoList.add(userDto);
+		}
+
+		return returnUserDtoList;
 	}
 
 }
