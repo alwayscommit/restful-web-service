@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
 import com.mobilewebapp.ws.mobilewebappws.io.entity.UserEntity;
+import com.mobilewebapp.ws.mobilewebappws.model.response.ErrorMessages;
 import com.mobilewebapp.ws.mobilewebappws.repo.UserRepository;
 import com.mobilewebapp.ws.mobilewebappws.service.UserService;
 import com.mobilewebapp.ws.mobilewebappws.util.Utils;
@@ -85,6 +86,33 @@ public class UserServiceImpl implements UserService {
 		UserDto userDto = new UserDto();
 		BeanUtils.copyProperties(userEntity, userDto);
 		return userDto;
+	}
+
+	@Override
+	public UserDto updateUser(String id, UserDto userDto) {
+		UserEntity userEntity = userRepo.findByUserId(id);
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		}
+
+		userEntity.setFirstName(userDto.getFirstName());
+		userEntity.setLastName(userDto.getLastName());
+
+		UserEntity savedUserEntity = userRepo.save(userEntity);
+
+		UserDto returnValue = new UserDto();
+		BeanUtils.copyProperties(savedUserEntity, returnValue);
+
+		return returnValue;
+	}
+
+	@Override
+	public void deleteUser(String id) {
+		UserEntity userEntity = userRepo.findByUserId(id);
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+		}
+		userRepo.delete(userEntity);
 	}
 
 }

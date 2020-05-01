@@ -16,6 +16,9 @@ import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
 import com.mobilewebapp.ws.mobilewebappws.exception.UserServiceException;
 import com.mobilewebapp.ws.mobilewebappws.model.request.UserRequest;
 import com.mobilewebapp.ws.mobilewebappws.model.response.ErrorMessages;
+import com.mobilewebapp.ws.mobilewebappws.model.response.OperationStatusModel;
+import com.mobilewebapp.ws.mobilewebappws.model.response.RequestOperationName;
+import com.mobilewebapp.ws.mobilewebappws.model.response.RequestOperationStatus;
 import com.mobilewebapp.ws.mobilewebappws.model.response.UserRest;
 import com.mobilewebapp.ws.mobilewebappws.service.UserService;
 
@@ -56,14 +59,31 @@ public class UserController {
 		return userResponse;
 	}
 
-	@DeleteMapping
-	public String deleteUser() {
-		return "Deleted a User...";
+	@PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE })
+	public UserRest updateUser(@PathVariable String id, @RequestBody UserRequest userRequest) {
+
+		UserDto userDto = new UserDto();
+		BeanUtils.copyProperties(userRequest, userDto);
+
+		UserDto savedUserDto = userService.updateUser(id, userDto);
+
+		UserRest userResponse = new UserRest();
+		BeanUtils.copyProperties(savedUserDto, userResponse);
+
+		return userResponse;
 	}
 
-	@PutMapping
-	public String updateUser() {
-		return "Updated a User...";
+	@DeleteMapping(path = "/{id}", consumes = { MediaType.APPLICATION_XML_VALUE,
+			MediaType.APPLICATION_JSON_VALUE }, produces = { MediaType.APPLICATION_XML_VALUE,
+					MediaType.APPLICATION_JSON_VALUE })
+	public OperationStatusModel deleteUser(@PathVariable String id) {
+		OperationStatusModel response = new OperationStatusModel();
+		response.setOperationName(RequestOperationName.DELETE.name());
+		userService.deleteUser(id);
+		response.setOperationResult(RequestOperationStatus.SUCCESS.name());
+		return response;
 	}
 
 }
