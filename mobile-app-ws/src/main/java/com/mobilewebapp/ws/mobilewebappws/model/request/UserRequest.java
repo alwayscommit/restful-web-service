@@ -1,11 +1,22 @@
 package com.mobilewebapp.ws.mobilewebappws.model.request;
 
+import java.util.List;
+
 public class UserRequest {
 
 	private String password;
 	private String firstName;
 	private String lastName;
 	private String email;
+	private List<AddressRequest> addresses;
+	
+	public List<AddressRequest> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<AddressRequest> addresses) {
+		this.addresses = addresses;
+	}
 
 	public String getPassword() {
 		return password;

@@ -14,6 +14,10 @@ public class Utils {
 	public String generateUserId(int length) {
 		return generateUserIdString(length);
 	}
+	
+	public String generateAddressId(int length) {
+		return generateUserIdString(length);
+	}
 
 	private String generateUserIdString(int length) {
 		StringBuilder string = new StringBuilder();

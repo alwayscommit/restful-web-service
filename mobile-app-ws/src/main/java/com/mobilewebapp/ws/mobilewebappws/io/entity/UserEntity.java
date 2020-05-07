@@ -1,11 +1,16 @@
 package com.mobilewebapp.ws.mobilewebappws.io.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
 
 @Entity(name = "users")
 public class UserEntity implements Serializable {
@@ -37,6 +42,18 @@ public class UserEntity implements Serializable {
 	// To put a default value, the above statement might not work with some
 	// databases, hence just put = false;
 	private Boolean emailVerificationStatus = false;
+
+	// private UserDto userDetails;
+	@OneToMany(mappedBy = "userDetails", cascade = CascadeType.ALL)
+	private List<AddressEntity> addresses;
+
+	public List<AddressEntity> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<AddressEntity> addresses) {
+		this.addresses = addresses;
+	}
 
 	public long getId() {
 		return id;

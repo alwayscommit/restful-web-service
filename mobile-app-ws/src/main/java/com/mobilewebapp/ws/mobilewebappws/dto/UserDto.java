@@ -1,6 +1,7 @@
 package com.mobilewebapp.ws.mobilewebappws.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UserDto implements Serializable {
 
@@ -24,6 +25,17 @@ public class UserDto implements Serializable {
 
 	private Boolean emailVerificationStatus;
 	
+	private List<AddressDto> addresses;
+	
+	
+	public List<AddressDto> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<AddressDto> addresses) {
+		this.addresses = addresses;
+	}
+
 	public String getPassword() {
 		return password;
 	}

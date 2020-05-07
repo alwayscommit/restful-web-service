@@ -3,6 +3,7 @@ package com.mobilewebapp.ws.mobilewebappws.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mobilewebapp.ws.mobilewebappws.dto.AddressDto;
 import com.mobilewebapp.ws.mobilewebappws.dto.UserDto;
 import com.mobilewebapp.ws.mobilewebappws.io.entity.UserEntity;
 import com.mobilewebapp.ws.mobilewebappws.model.response.ErrorMessages;
@@ -41,21 +43,26 @@ public class UserServiceImpl implements UserService {
 		if (existingUser != null) {
 			throw new RuntimeException("Email already exists!");
 		}
-
-		UserEntity newUserEntity = new UserEntity();
-		BeanUtils.copyProperties(userDto, newUserEntity);
-
-		newUserEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
-
+		
+		for(int i=0; i<userDto.getAddresses().size();i++) {
+			AddressDto address = userDto.getAddresses().get(i);
+			address.setUserDetails(userDto);
+			address.setAddressId(utils.generateAddressId(30));
+			userDto.getAddresses().set(i, address);
+		}
+		
+		ModelMapper modelMapper = new ModelMapper();
+		UserEntity newUserEntity = modelMapper.map(userDto, UserEntity.class);
+		
 		// randomly generated userId
 		String userId = utils.generateUserId(25);
 		newUserEntity.setUserId(userId);
+		newUserEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
 
 		UserEntity savedUserEntity = userRepo.save(newUserEntity);
-
-		UserDto returnUserDto = new UserDto();
-		BeanUtils.copyProperties(savedUserEntity, returnUserDto);
-
+		
+		UserDto returnUserDto = modelMapper.map(savedUserEntity, UserDto.class);
+		
 		return returnUserDto;
 	}
 
