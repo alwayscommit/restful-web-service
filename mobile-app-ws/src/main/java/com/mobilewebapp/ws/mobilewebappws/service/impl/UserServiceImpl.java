@@ -43,26 +43,27 @@ public class UserServiceImpl implements UserService {
 		if (existingUser != null) {
 			throw new RuntimeException("Email already exists!");
 		}
-		
-		for(int i=0; i<userDto.getAddresses().size();i++) {
+
+		for (int i = 0; i < userDto.getAddresses().size(); i++) {
 			AddressDto address = userDto.getAddresses().get(i);
 			address.setUserDetails(userDto);
 			address.setAddressId(utils.generateAddressId(30));
 			userDto.getAddresses().set(i, address);
 		}
-		
+
 		ModelMapper modelMapper = new ModelMapper();
 		UserEntity newUserEntity = modelMapper.map(userDto, UserEntity.class);
-		
+
 		// randomly generated userId
 		String userId = utils.generateUserId(25);
 		newUserEntity.setUserId(userId);
 		newUserEntity.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
-
+		newUserEntity.setEmailVerificationToken(utils.generateEmailVerfToken(userId));
+		newUserEntity.setEmailVerificationStatus(false);
 		UserEntity savedUserEntity = userRepo.save(newUserEntity);
-		
+
 		UserDto returnUserDto = modelMapper.map(savedUserEntity, UserDto.class);
-		
+
 		return returnUserDto;
 	}
 
@@ -72,7 +73,12 @@ public class UserServiceImpl implements UserService {
 		if (userEntity == null) {
 			throw new UsernameNotFoundException(email);
 		}
-		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+//		 return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new
+//		 ArrayList<>());
+//		passing of userEntity.getEmailVerificationStatus() will prevent the user from logging
+//		in if the email is not verified
+		return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(),
+				userEntity.getEmailVerificationStatus(), true, true, true, new ArrayList<>());
 	}
 
 	@Override
@@ -129,11 +135,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<UserDto> getUsers(int page, int limit) {
 		List<UserDto> returnUserDtoList = new ArrayList<UserDto>();
-		
-		if(page>0) {
+
+		if (page > 0) {
 			page = page - 1;
 		}
-		
+
 		Pageable pageReq = PageRequest.of(page, limit);
 		Page<UserEntity> usersPage = userRepo.findAll(pageReq);
 		List<UserEntity> users = usersPage.getContent();
@@ -145,6 +151,26 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return returnUserDtoList;
+	}
+
+	@Override
+	public boolean verifyEmailToken(String token) {
+		boolean returnVerified = false;
+
+		// Find user by token
+		UserEntity userEntity = userRepo.findUserByEmailVerificationToken(token);
+
+		if (userEntity != null) {
+			boolean hastokenExpired = Utils.hasTokenExpired(token);
+			if (!hastokenExpired) {
+				userEntity.setEmailVerificationToken(null);
+				userEntity.setEmailVerificationStatus(Boolean.TRUE);
+				userRepo.save(userEntity);
+				returnVerified = true;
+			}
+		}
+
+		return returnVerified;
 	}
 
 }

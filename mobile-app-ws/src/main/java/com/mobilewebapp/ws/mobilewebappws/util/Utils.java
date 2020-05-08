@@ -1,9 +1,17 @@
 package com.mobilewebapp.ws.mobilewebappws.util;
 
 import java.security.SecureRandom;
+import java.util.Date;
 import java.util.Random;
 
 import org.springframework.stereotype.Component;
+
+import com.mobilewebapp.ws.mobilewebappws.security.SecurityConstants;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class Utils {
@@ -14,7 +22,7 @@ public class Utils {
 	public String generateUserId(int length) {
 		return generateUserIdString(length);
 	}
-	
+
 	public String generateAddressId(int length) {
 		return generateUserIdString(length);
 	}
@@ -27,6 +35,33 @@ public class Utils {
 		}
 
 		return new String(string);
+	}
+
+	public static boolean hasTokenExpired(String token) {
+		boolean returnValue = false;
+
+		try {
+			Claims claims = Jwts.parser().setSigningKey(SecurityConstants.getTokenSecret()).parseClaimsJws(token)
+					.getBody();
+			Date tokenExpirationDate = claims.getExpiration();
+			Date todayDate = new Date();
+
+			returnValue = tokenExpirationDate.before(todayDate);
+		} catch (ExpiredJwtException ex) {
+			returnValue = true;
+		}
+
+		return returnValue;
+	}
+
+	public String generateEmailVerfToken(String userId) {
+		
+		String token = Jwts.builder()
+                .setSubject(userId)
+                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SecurityConstants.getTokenSecret())
+                .compact();
+        return token;
 	}
 
 }
