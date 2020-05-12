@@ -21,6 +21,7 @@ import com.mobilewebapp.ws.mobilewebappws.io.entity.UserEntity;
 import com.mobilewebapp.ws.mobilewebappws.model.response.ErrorMessages;
 import com.mobilewebapp.ws.mobilewebappws.repo.UserRepository;
 import com.mobilewebapp.ws.mobilewebappws.service.UserService;
+import com.mobilewebapp.ws.mobilewebappws.shared.AmazonSES;
 import com.mobilewebapp.ws.mobilewebappws.util.Utils;
 
 @Service
@@ -64,6 +65,8 @@ public class UserServiceImpl implements UserService {
 
 		UserDto returnUserDto = modelMapper.map(savedUserEntity, UserDto.class);
 
+		new AmazonSES().sendVerificationEmail(returnUserDto);
+		
 		return returnUserDto;
 	}
 
