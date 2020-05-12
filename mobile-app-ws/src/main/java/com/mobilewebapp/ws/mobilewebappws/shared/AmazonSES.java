@@ -52,8 +52,8 @@ public class AmazonSES {
 
 	public void sendVerificationEmail(UserDto userDto) {
 
-		 System.setProperty("aws.accessKeyId", "AKIASPQKQ5CCSDAVOBWQ");
-		 System.setProperty("aws.secretKey", "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");
+		 System.setProperty("aws.accessKeyId", "");
+		 System.setProperty("aws.secretKey", "");
 
 		AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(Regions.AP_SOUTH_1)
 				.build();
